@@ -1,0 +1,250 @@
+html, body {
+    flex-direction: column;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  a:link { color: red; text-decoration: none;}
+  a:visited { color: white; text-decoration: none;}
+  a:hover { color: blue; text-decoration: none;}
+  
+  .top {
+    background-color: #333;
+    min-height: 70px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    flex-grow: 0;
+  }
+  
+  .columns {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .column {
+    display: flex;
+    flex-direction: column;
+    line-height: normal;
+    width: calc(50%);
+    margin: 0;
+  }
+  
+  .div-3 {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 0px;
+    padding-left: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    min-height: 50px;
+  
+    height: auto;
+    width: auto;
+  
+    flex-grow: 0;
+    color: rgb(255, 255, 255);
+    font-size: 25px;
+    text-align: center;
+    margin-right: auto;
+    align-self: center;
+  }
+  
+  .column-2 {
+    display: flex;
+    flex-direction: column;
+    line-height: normal;
+    width: calc(30%);
+    margin-left: 25%;
+    float: right;
+  }
+  
+  .div-4 {
+    display: flex;
+    flex-direction: column;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+  
+  .column-3 {
+    display: flex;
+    flex-direction: column;
+    line-height: normal;
+    width: calc(18.43% - 16px);
+    margin-left: 0px;
+  }
+  
+  .column-6 {
+    display: flex;
+    flex-direction: column;
+    line-height: normal;
+    width: calc(20.99% - 16px);
+    margin-left: 20px;
+  }
+  
+  .div-8 {
+    color: rgba(255, 255, 255);
+    font-size: 16px;
+    letter-spacing: 0%;
+    text-align: left;
+    font-family: Abel, sans-serif;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+  
+  .column-7 {
+    display: flex;
+    flex-direction: column;
+    line-height: normal;
+    width: calc(26.24% - 16px);
+    margin-left: 20px;
+  }
+  
+  
+  .div-9 {
+    color: rgba(255, 255, 255);
+    font-size: 16px;
+    letter-spacing: 0%;
+    text-align: center;
+    font-family: Abel, sans-serif;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+  
+  
+  .medium {
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(255, 255, 255, 1);
+    width: 100%;
+    min-height: 1000px;
+    height: 100%;
+    flex-grow: 0;
+  }
+  
+  .column-8 {
+    display: flex;
+    flex-direction: column;
+    line-height: normal;
+    width: calc(19.99% - 13.333333333333334px);
+    margin-left: 0px;
+  }
+  
+  .div-11 {
+    display: flex;
+    position: relative;
+    min-width: 300px;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 100%;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 10px;
+    padding-left: 10px;
+    height: auto;
+    flex-grow: 1;
+  }
+  
+
+
+  .column-9 {
+    display: flex;
+    flex-direction: column;
+    line-height: normal;
+    width: calc(60% - 15px);
+    margin-left: 0px;
+  }
+  
+  .form-control {
+      width: 100%;
+      height: 100%;
+
+  }
+
+  .div-12 {
+    display: flex;
+    flex-grow: 1;
+    position: relative;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 10px;
+    padding-left: 10px;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .card {
+      width: 100%;
+      height: 90%;
+  }
+
+  .btn-toolbar {
+    padding-top: 20px;
+      width: 100%;
+      height: 5%;
+  }
+
+  .card-body {
+      width: 100%;
+      height: 100%;
+  }
+
+  
+  .column-10 {
+    display: flex;
+    flex-direction: column;
+    line-height: normal;
+    width: calc(19.99% - 13.333333333333334px);
+    margin-left: 20px;
+  }
+  
+  .div-13 {
+    display: flex;
+    position: relative;
+    min-width: 20px;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 100%;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 10px;
+    padding-left: 10px;
+    text-align: center;
+    height: auto;
+    flex-grow: 1;
+  }
+  
+  .bottom {
+    display: flex;
+    min-height: 70px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #333;
+    width: auto;
+    height: auto;
+    
+  }
+  
+  .footer {
+    color: rgb(255, 255, 255);
+    font-size: 16px;
+    text-align: center;
+    align-self: center;
+  }

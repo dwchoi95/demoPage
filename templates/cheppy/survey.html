@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    {% load static %}
+    {% load custom_tags %}
+    <link rel="stylesheet" href="{% static 'admin/css/footer.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="container mb-3">
+        <div class="row">
+            <div class="col-sm-2">
+                <h1 class="display-6">
+                    <a id="mainMenuLink" href="/">
+                        <img src="/static/admin/img/logo.png" class="img-fluid" alt="...">
+                    </a>
+                </h1>
+            </div>
+            <div class="col-sm-7">
+            </div>
+            <div class="col-sm-3 my-auto">
+                <ul class="nav justify-content-end align-middle">
+                    {% if email %}
+                    <li class="nav-item pe-3">
+                        <a class="btn btn-outline-secondary my-auto" href="/logout">로그아웃</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-primary my-auto" href="/course">마이페이지</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item pe-3">
+                        <a class="btn btn-outline-secondary my-auto" href="/login">로그인</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-primary my-auto" href="/sign">회원가입</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <hr>
+
+    <div class="container">
+        <div class="container pt-5 pb-5 mb-3 " style="background-color:#1c42ff">
+            <div class="container ms-5 text-start text-white">
+                <h3>설문조사</h3>
+                <h5>설문 결과의 익명은 보장되며, 개인정보의 사용은 쿠폰 발송을 위한 작업 이외에는 사용되지 않습니다.</h5>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <h4 class="fw-bold text-center mt-3"></h4>
+                <form class="container bg-white px-4 mb-3" action="">
+                    <div class ="container mb-3">
+                        <p class="fw-bold">1. 직업이 어떻게 되시나요?</p>
+                        <input type="text" class="form-control" placeholder="직업" aria-label="job">
+                    </div>
+                    <div class ="container mb-3">
+                        <p class="fw-bold">2. 문제의 난이도는 어땠나요?</p>
+                        <div class="form-check mb-2">
+                          <input class="form-check-input" type="radio" name="exampleForm" id="radioExample1" />
+                          <label class="form-check-label" for="radioExample1">
+                            매우 쉬움
+                          </label>
+                        </div>
+                        <div class="form-check mb-2">
+                          <input class="form-check-input" type="radio" name="exampleForm" id="radioExample2" />
+                          <label class="form-check-label" for="radioExample2">
+                            쉬움
+                          </label>
+                        </div>
+                        <div class="form-check mb-2">
+                          <input class="form-check-input" type="radio" name="exampleForm" id="radioExample3" />
+                          <label class="form-check-label" for="radioExample3">
+                            적당함
+                          </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="exampleForm" id="radioExample4" />
+                            <label class="form-check-label" for="radioExample4">
+                              어려움
+                            </label>
+                          </div>
+                          <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="exampleForm" id="radioExample5" />
+                            <label class="form-check-label" for="radioExample5">
+                              매우 어려움
+                            </label>
+                          </div>
+                    </div>
+                    <div class ="container mb-3">
+                        <p class="fw-bold">3. 컴파일 결과 혹은 채점 결과에 불만은 없었나요?</p>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="exampleForm" id="radioExample1" />
+                            <label class="form-check-label" for="radioExample1">
+                              있음
+                            </label>
+                          </div>
+                          <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="exampleForm" id="radioExample2" />
+                            <label class="form-check-label" for="radioExample2">
+                              없음
+                            </label>
+                          </div>
+                    </div>
+                    <div class ="container mb-3">
+                        <p class="fw-bold">4. 불만이 있었다면 어떤 불만이 있었나요</p>
+                        <input type="text" class="form-control" placeholder="컴파일 결과가 너무 알아보기 힘들었다...등" aria-label="complain">
+                    </div>
+                    <div class ="container mb-3">
+                        <p class="fw-bold">5. hint가 막혔을때 도움이 되었나요?</p>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="exampleForm" id="radioExample1" />
+                            <label class="form-check-label" for="radioExample1">
+                                전혀 도움 안됨
+                            </label>
+                          </div>
+                          <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="exampleForm" id="radioExample2" />
+                            <label class="form-check-label" for="radioExample2">
+                              도움 안됨
+                            </label>
+                          </div>
+                          <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="exampleForm" id="radioExample3" />
+                            <label class="form-check-label" for="radioExample3">
+                              도움 됨
+                            </label>
+                          </div>
+                          <div class="form-check mb-2">
+                              <input class="form-check-input" type="radio" name="exampleForm" id="radioExample4" />
+                              <label class="form-check-label" for="radioExample4">
+                                매우 도움 됨
+                              </label>
+                            </div>
+                    </div>
+                    <div class ="container mb-3">
+                        <p class="fw-bold">6. hint의 품질은 어땠나요?</p>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="exampleForm" id="radioExample1" />
+                            <label class="form-check-label" for="radioExample1">
+                                매우 좋지 않음
+                            </label>
+                          </div>
+                          <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="exampleForm" id="radioExample2" />
+                            <label class="form-check-label" for="radioExample2">
+                              좋지 않음
+                            </label>
+                          </div>
+                          <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="exampleForm" id="radioExample3" />
+                            <label class="form-check-label" for="radioExample3">
+                              좋음
+                            </label>
+                          </div>
+                          <div class="form-check mb-2">
+                              <input class="form-check-input" type="radio" name="exampleForm" id="radioExample4" />
+                              <label class="form-check-label" for="radioExample4">
+                                매우 좋음
+                              </label>
+                            </div>
+                    </div>
+                    <div class ="container mb-3">
+                        <p class="fw-bold">7. 피드백을 통해 본인의 코드의 잘못된 부분을 알 수 있었나요</p>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="exampleForm" id="radioExample1" />
+                            <label class="form-check-label" for="radioExample1">
+                                전혀 알 수 없었음
+                            </label>
+                          </div>
+                          <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="exampleForm" id="radioExample2" />
+                            <label class="form-check-label" for="radioExample2">
+                              알 수 없었음
+                            </label>
+                          </div>
+                          <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="exampleForm" id="radioExample3" />
+                            <label class="form-check-label" for="radioExample3">
+                              알 수 있었음
+                            </label>
+                          </div>
+                          <div class="form-check mb-2">
+                              <input class="form-check-input" type="radio" name="exampleForm" id="radioExample4" />
+                              <label class="form-check-label" for="radioExample4">
+                                잘 알 수 있었음
+                              </label>
+                            </div>
+                    </div>
+                    <div class ="container mb-3">
+                        <p class="fw-bold">8. 각각의 피드백을 보았을때 "왜 이렇게 고쳐야하지?" 라는 의문이 들던가요?</p>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="exampleForm" id="radioExample1" />
+                            <label class="form-check-label" for="radioExample1">
+                                전혀 들지 않았음
+                            </label>
+                          </div>
+                          <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="exampleForm" id="radioExample2" />
+                            <label class="form-check-label" for="radioExample2">
+                               딱히 들지 않았음
+                            </label>
+                          </div>
+                          <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="exampleForm" id="radioExample3" />
+                            <label class="form-check-label" for="radioExample3">
+                              좀 들었음
+                            </label>
+                          </div>
+                          <div class="form-check mb-2">
+                              <input class="form-check-input" type="radio" name="exampleForm" id="radioExample4" />
+                              <label class="form-check-label" for="radioExample4">
+                                매우 들었음
+                              </label>
+                            </div>
+                    </div>
+                    <div class ="container mb-3">
+                        <p class="fw-bold">9. 나중에 코딩 관련 공부를 할때에도 Feedback이 필요하실 것 같나요?</p>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="exampleForm" id="radioExample1" />
+                            <label class="form-check-label" for="radioExample1">
+                                전혀 필요 없음
+                            </label>
+                          </div>
+                          <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="exampleForm" id="radioExample2" />
+                            <label class="form-check-label" for="radioExample2">
+                               필요 없음
+                            </label>
+                          </div>
+                          <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="exampleForm" id="radioExample3" />
+                            <label class="form-check-label" for="radioExample3">
+                               필요할 것 같음
+                            </label>
+                          </div>
+                          <div class="form-check mb-2">
+                              <input class="form-check-input" type="radio" name="exampleForm" id="radioExample4" />
+                              <label class="form-check-label" for="radioExample4">
+                                매우 필요할 것 같음
+                              </label>
+                            </div>
+                    </div>
+                    <div class ="container mb-3">
+                        <p class="fw-bold">10. 개선될 부분이나 맘에 들지 않았던 부분을 말씀해주시면 감사하겠습니다.</p>
+                        <input type="text" class="form-control" placeholder="디자인이 구려요.." aria-label="improvement">
+                    </div>
+                    <div class ="container mb-3">
+                        <p class="fw-bold">11. 스타벅스 쿠폰에 응모할 이름과 전화번호를 알려주세요!</p>
+                        <input type="text" class="form-control" placeholder="김철수, 010-1234-5678" aria-label="contact">
+                    </div>
+                    <div class="container text-end mt-5">
+                        <a type="button" class="btn btn-primary" href="/">Submit</a>
+                      </div>
+                </form>
+                
+              </div>
+            
+        </div>
+
+    </div>
+    <div class="bg-light pt-4 pb-5">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-2">
+                    <a class="link-secondary text-decoration-none" href="#">
+                        <h6 class="text-center">서비스 이용약관</h6>
+                    </a>
+                </div>
+                <div class="col-2">
+                    <a class="link-secondary text-decoration-none" href="#">
+                        <h6 class="text-center">개인정보 처리방침</h6>
+                    </a>
+                </div>
+                <div class="col-1">
+                    <a class="link-secondary text-decoration-none" href="#">
+                        <h6 class="text-center">공지</h6>
+                    </a>
+                </div>
+                <div class="col-1">
+                    <a class="link-secondary text-decoration-none" href="#">
+                        <h6 class="text-center">문의</h6>
+                    </a>
+                </div>
+                <div class="col-6 text-end">
+                    <a class="ms-2" href="#"><img src="/static/admin/img/footer_call.png" class="img-fluid" alt="..."></a>
+                    <a class="ms-2" href="#"><img src="/static/admin/img/footer_mail.png" class="img-fluid" alt="..."></a>
+                    <a class="ms-2" href="#"><img src="/static/admin/img/footer_insta.png" class="img-fluid" alt="..."></a>
+                </div>
+            </div>
+            <div class="container">
+                <div class="container">
+                    <h4>C h e p p y</h4>
+                </div>
+                <div class="container">
+                    <p class="text-secondary">
+                        (주)SoTy | 대표 최동욱 | 경기도 수원시 장안구 서부로 2066<br>
+                        010-1234-5678 | contact@soty.com
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
