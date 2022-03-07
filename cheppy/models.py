@@ -4,19 +4,24 @@ from django.db import models
 
 class Account(models.Model):
     email = models.EmailField(primary_key=True)
-    password = models.CharField(max_length=20)
-    name = models.CharField(max_length=20)
-    birth = models.CharField(max_length=6)
+    name = models.CharField(max_length=10)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
 class Assignment(models.Model):
+    LEVEL_CHOICES = (
+        ('1', '초급'),
+        ('2', '중급'),
+        ('3', '상급'),
+    )
     assignment_no = models.AutoField(primary_key=True)
     title = models.CharField(max_length=50)
     problem = models.TextField()
     constraint = models.TextField()
     format = models.TextField()
-    deadline = models.DateField()
+    answer = models.TextField()
+    level = models.CharField(max_length=1, choices=LEVEL_CHOICES, default='1')
+    timeout = models.IntegerField(default=1)
 
 
 class Testsuite(models.Model):
@@ -25,7 +30,7 @@ class Testsuite(models.Model):
     tc_no = models.IntegerField()
     in_tc = models.TextField()
     out_tc = models.TextField()
-    open_tc = models.BooleanField()
+    open_tc = models.BooleanField(default=True)
 
 
 class Submission(models.Model):
@@ -33,7 +38,17 @@ class Submission(models.Model):
     assignment_no = models.ForeignKey(Assignment, on_delete=models.CASCADE)
     email = models.ForeignKey(Account, on_delete=models.CASCADE)
     program = models.TextField()
+    attempt = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class Solution(models.Model):
+    solution_no = models.AutoField(primary_key=True)
+    assignment_no = models.ForeignKey(Assignment, on_delete=models.CASCADE)
+    program = models.TextField()
+    standardization = models.TextField(null=True, blank=True)
+    specification = models.TextField(null=True, blank=True)
+    
 
 
 class Grade(models.Model):
@@ -46,3 +61,5 @@ class Grade(models.Model):
     feedback = models.TextField()
     patch = models.TextField()
     result = models.CharField(max_length=10)
+    # attempt = models.IntegerField()
+

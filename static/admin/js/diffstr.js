@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
     fileListStartVisible: false,
     fileContentToggle: false,
     matching: 'lines',
-    outputFormat: 'line-by-line',
+    outputFormat: 'side-by-side',
     synchronisedScroll: true,
     highlight: true,
     renderNothingWhenEmpty: false

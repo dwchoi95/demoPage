@@ -7,19 +7,17 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib import auth
 
-import os, sys
-from subprocess import check_output, STDOUT, CalledProcessError
-import json
-import tempfile
 
+from collections import OrderedDict
+from io import StringIO
 import warnings
+import os, sys
+import difflib
+
 warnings.filterwarnings('ignore')
 
-sys.path.append(os.path.dirname(os.path.abspath(
-            os.path.dirname(os.path.abspath(
-                    os.path.dirname(__file__))))))
-# from GraFee.grafee import *
-# from GraFee.execution import *
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))))
+from GraFee.core import *
 
 from .models import *
 from .forms import *
@@ -34,68 +32,31 @@ def main(request):
     return render(request, 'cheppy/main.html')
 
 
-def sign(request):
-    error = None
-    if request.method == "POST":
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        name = request.POST.get('name')
-        birth = request.POST.get('birth')
-        if not email:
-            error = '이메일을 입력해주세요.'
-        elif not password:
-            error = '비밀번호를 입력해주세요.'
-        elif not name:
-            error = '이름을 입력해주세요.'
-        elif not birth:
-            error = '생년월일을 입력해주세요.'
-        elif email:
-            try:
-                Account.objects.get(email=email)
-                error = '이미 존재하는 이메일입니다.'
-            except: pass
-        elif birth:
-            if len(birth) != 6:
-                error = '생년월일을 6자리로 입력해주세요.'
-        
-        if error is None:
-            account = Account()
-            account.email = email
-            account.password = password
-            account.name = name
-            account.birth = birth
-            account.created_at = datetime.now()
-            account.save()
-            return render(request, 'cheppy/login.html', {
-                'account' : account,
-            })
-        
-        messages.error(request, error, extra_tags='danger')
-        return render(request, 'cheppy/sign.html', {
-                'email' : email,
-                'password':password,
-                'name':name,
-                'birth':birth,
-            })
-
-    return render(request, 'cheppy/sign.html')
-
-
 def login(request):
     if request.method == "POST":
         email = request.POST.get('email')
-        password = request.POST.get('password')
+        name = request.POST.get('name')
 
         try:
-            account = Account.objects.get(email=email, password=password)
+            account = Account.objects.get(email=email, name=name)
             if account:
                 request.session['email'] = account.email
+                request.session['name'] = account.name
                 return redirect(course)
         except: pass
 
-        error = "이메일 혹은 비밀번호를 다시 확인해주세요."
-        messages.error(request, error, extra_tags='danger')
-        return HttpResponseRedirect('/login/')
+        try:
+            account = Account()
+            account.email = email
+            account.name = name
+            account.save()
+            request.session['email'] = account.email
+            request.session['name'] = account.name
+            return redirect(course)
+        except:
+            error = "이미 존재하는 이메일입니다."
+            messages.error(request, error, extra_tags='danger')
+            return HttpResponseRedirect('/login/')
 
     return render(request, 'cheppy/login.html')
 
@@ -107,7 +68,17 @@ def logout(request):
 
 def course(request):
     email = request.session.get('email')
+    name = request.session.get('name')
     
+    if request.method == "POST":
+        assignment_no = request.POST.get('assignment_no')
+        request.session['assignment_no'] = assignment_no
+        
+        if 'solution' in request.POST:
+            return redirect(solution)
+
+        return redirect(coding)
+
     if email:
         assignments = Assignment.objects.all()
         submissions = Submission.objects.filter(email=email)
@@ -130,6 +101,7 @@ def course(request):
         
         return render(request, 'cheppy/course.html', {
             'email':email,
+            'name':name,
             'data':data,
             'solved':solved,
         })
@@ -139,67 +111,196 @@ def course(request):
 
 def coding(request):
     email = request.session.get('email')
+    name = request.session.get('name')
+    assignment_no = request.session.get('assignment_no')
     
-    if request.method == "POST":
-        btn = ""
-        
-        if 'assignment_no' in request.POST:
-            assignment_no = request.POST.get('assignment_no')
-            request.session['assignment_no'] = assignment_no
-        else:
-            assignment_no = request.session.get('assignment_no')
-
+    if assignment_no:
         assignment = Assignment.objects.get(assignment_no=assignment_no)
-        testcases = Testsuite.objects.filter(assignment_no=assignment_no)
+        testsuite = Testsuite.objects.filter(assignment_no=assignment_no)
         
-        if "solve" in request.POST:
-            btn = "solve"
-            return render(request, 'cheppy/coding.html', {
-                "email":email,
-                'assignment':assignment,
-                'testcases':testcases,
-                'btn':btn
-            })
-
-        elif "solution" in request.POST:
-            btn = "solution"
-            submit_no = request.POST.get('submit_no')
-            grade_no = request.POST.get('grade_no')
-
-            submission = Submission.objects.get(submit_no=submit_no)
-            grade = Grade.objects.get(grade_no=grade_no)
-
-            code = open(submission.program).read()
-            
-            feedback = eval(grade.feedback)
-            
-            feed_length = 0
-            for feed in feedback.values():
-                feed_length += len(feed)
-
-            return render(request, 'cheppy/coding.html', {
-                "email":email,
-                "assignment":assignment,
-                'testcases':testcases,
-                "code":code,
-                "state":grade.state,
-                "score":grade.score,
-                "passfail":eval(grade.passfail),
-                "feedback":feedback,
-                "feed_length":feed_length,
-                "patch":grade.patch,
-                "result":grade.result,
-                "diff":diff_2_str(code, grade.patch),
-                "btn":btn,
-            })
-
-        assignment_path = "../Data/Refactory/Assignments/question_"+assignment_no+"/"
-        file_name = email.split('@')[0]+'.py'
-        submission_path = assignment_path+'submission/'+file_name
-        code = request.POST.get('code')
+        testsuite_map = {}
+        for testcase in testsuite:
+            if testcase.open_tc:
+                testsuite_map[testcase.tc_no] = (testcase.in_tc, testcase.out_tc)
         
-        if "feed" in request.POST:
+        testsuite_map = OrderedDict(sorted(testsuite_map.items()))
+
+        if request.method == "POST":
+            btn = "error"
+            code = request.POST.get('code')
+
+            try: compile(code, "<string>", "exec")
+            except:
+                return render(request, 'cheppy/coding.html', {
+                    "email":email,
+                    'name':name,
+                    "assignment":assignment,
+                    'testsuite':testsuite_map,
+                    "code":code,
+                    "result":"오류가 있어 실행할 수 없습니다.\n코드를 확인해주세요.",
+                    "btn":btn,
+                })
+
+            if "execute" in request.POST:
+                btn = "execute"
+                
+                result = "출력되는 값이 없습니다.\nReturn 되는 값이 있는지 함수를 제대로 실행시키고 있는지 확인해보세요."
+
+                backup_stdout = sys.stdout
+                sys.stdout = StringIO()
+
+                try:
+                    exec(code, globals())
+                except:
+                    pass
+
+                result = sys.stdout.getvalue().strip()
+
+                if sys.stdout != backup_stdout:
+                    sys.stdout.close()
+                    sys.stdout = backup_stdout
+
+                if not result or result == "None":
+                    result = "아무런 출력값이 없습니다."
+                
+                return render(request, 'cheppy/coding.html', {
+                    "email":email,
+                    'name':name,
+                    "assignment":assignment,
+                    'testsuite':testsuite_map,
+                    "code":code,
+                    "result":result,
+                    "btn":btn,
+                })
+
+            solutions = {}
+            for sol in Solution.objects.filter(assignment_no=assignment_no):
+                try:
+                    sub = Submission.objects.get(program=sol.program)
+                    solutions[sub.submit_no] = (sol.program, sol.standardization, sol.specification)
+                except: pass
+                
+            programs = {}
+            attempt = 0
+            for submit in Submission.objects.filter(assignment_no=assignment_no, email=email):
+                if submit.attempt > attempt:
+                    attempt = submit.attempt
+
+            submission = Submission()
+            submission.assignment_no = assignment
+            submission.email = Account.objects.get(email=email)
+            submission.program = code
+            submission.attempt = attempt + 1
+            submission.created_at = datetime.now()
+            submission.save()
+
+            programs[submission.submit_no] = code
+            
+            testsuite = {}
+            for testcase in Testsuite.objects.filter(assignment_no=assignment_no):
+                testsuite[testcase.tc_no] = (testcase.in_tc, testcase.out_tc)
+
+            gf = GraFee(solutions, assignment.format, {'reference':assignment.answer}, programs, testsuite, assignment.timeout)
+            code_map, state_map, d_score_map, s_score_map, passfail_map, hints_map, patch_map, result_map, feedback_map, predata_map = gf.run()
+            
+            code = code_map[submission.submit_no]
+            state = state_map[submission.submit_no]
+            d_score = d_score_map[submission.submit_no]
+            passfail = passfail_map[submission.submit_no]
+            hints = hints_map[submission.submit_no]
+            feedback = feedback_map[submission.submit_no]
+            patch = patch_map[submission.submit_no]
+            result = result_map[submission.submit_no]
+
+            diff = diff_2_str(code, patch)
+
+            hint_length = 0
+            for hint in hints.values():
+                hint_length += len(hint)
+                
+            submission = Submission.objects.get(submit_no=submission.submit_no)
+            submission.program = code
+            submission.save()
+            
+            if state == 'correct':
+                predata = predata_map[submission.submit_no]
+                for (p_code, p_st_code, p_spec) in predata.values():
+                    specification = p_spec
+                    standardization = p_st_code
+                    solution = Solution()
+                    solution.assignment_no = assignment
+                    solution.program = code
+                    solution.specification = specification
+                    solution.standardization = standardization
+                    solution.save()
+
+            grade = Grade()
+            grade.submit_no = submission
+            grade.state = state
+            grade.score = d_score
+            grade.passfail = passfail
+            grade.hints = hints
+            grade.feedback = feedback
+            grade.patch = patch
+            grade.result = result
+            grade.save()
+
+
+            if "grading" in request.POST:
+                btn = "grading"
+
+
+                return render(request, 'cheppy/coding.html', {
+                    "email":email,
+                    'name':name,
+                    "assignment":assignment,
+                    'testsuite':testsuite_map,
+                    "code":code,
+                    "state":state,
+                    "score":d_score,
+                    "passfail":passfail,
+                    "hints":hints,
+                    "hint_length":hint_length,
+                    "patch":patch,
+                    "result":result,
+                    "diff":diff_2_str(code, patch),
+                    "btn":btn,
+                })
+            elif "submit" in request.POST:
+                return redirect(solution)
+
+        return render(request, 'cheppy/coding.html', {
+            "email":email,
+            'name':name,
+            "assignment":assignment,
+            'testsuite':testsuite_map,
+            "btn":"execute",
+        })
+
+
+    return render(request, 'cheppy/coding.html')
+
+
+def solution(request):
+    email = request.session.get('email')
+    name = request.session.get('name')
+    assignment_no = request.session.get('assignment_no')
+    
+    if assignment_no:
+        assignment = Assignment.objects.get(assignment_no=assignment_no)
+        testsuite = Testsuite.objects.filter(assignment_no=assignment_no)
+
+        testsuite_map = {}
+        for testcase in testsuite:
+            if testcase.open_tc:
+                testsuite_map[testcase.tc_no] = (testcase.in_tc, testcase.out_tc)
+        
+        testsuite_map = OrderedDict(sorted(testsuite_map.items()))
+
+        if request.method == "POST":
             btn = "feed"
+
+            code = request.POST.get('code')
             
             state = request.POST.get('state')
             score = request.POST.get('score')
@@ -234,10 +335,11 @@ def coding(request):
             for feed in feedback.values():
                 feed_length += len(feed)
 
-            return render(request, 'cheppy/coding.html', {
+            return render(request, 'cheppy/solution.html', {
                 "email":email,
+                'name':name,
                 "assignment":assignment,
-                'testcases':testcases,
+                'testsuite':testsuite_map,
                 "code":code,
                 "state":state,
                 "score":score,
@@ -250,119 +352,43 @@ def coding(request):
                 "btn":btn,
             })
 
-        elif "execute" in request.POST:
-            btn = "execute"
-            
-            with open(submission_path, 'w') as w:
-                w.write(code)
-            
-            result = ""
-            cmd = 'python ' + submission_path
-            try: result = check_output(cmd, stderr=STDOUT, shell=True, universal_newlines=True)
-            except CalledProcessError as err: result = err.output.strip().split('\n')[-1]
-
-            if not result:
-                result = "아무런 출력값이 없습니다."
-            
-            return render(request, 'cheppy/coding.html', {
-                "email":email,
-                "assignment":assignment,
-                'testcases':testcases,
-                "code":code,
-                "result":result,
-                "btn":btn,
-            })
-
         else:
-            try: code = regular(code)
-            except:
-                return render(request, 'cheppy/coding.html', {
-                    "email":email,
-                    "assignment":assignment,
-                    'testcases':testcases,
-                    "code":code,
-                    "result":"오류가 있어 실행할 수 없습니다.\n코드를 확인해주세요.",
-                    "btn":"error",
-                })
+            btn = "solution"
 
-            func_map = get_func_map(code)
-            
-            code = ""
-            for f_name, f_code in func_map.items():
-                if f_name == "main":
-                    continue
-                code += '\n\n' + f_code
-            if "main" in func_map.keys():
-                code += '\n\n' + func_map["main"]
+            submissions = Submission.objects.filter(email=email, assignment_no=assignment_no)
 
-            code = regular(code)
-            
-            with open(submission_path, 'w') as w:
-                w.write(code)
-
-            gf = GraFee(assignment_path, [submission_path], 1)
-            state_map, d_score_map, s_score_map, passfail_map, hints_map, patch_map, result_map, feedback_map = gf.run()
-            
-            state = state_map[file_name]
-            d_score = d_score_map[file_name]
-            passfail = passfail_map[file_name]
-            hints = hints_map[file_name]
-            feedback = feedback_map[file_name]
-            patch = patch_map[file_name]
-            result = result_map[file_name]
-
-            diff = diff_2_str(code, patch)
-
-            hint_length = 0
-            for hint in hints.values():
-                hint_length += len(hint)
+            submit_no = 0
+            code = ''
+            for submit in submissions:
+                if assignment.assignment_no == submit.assignment_no.assignment_no:
+                    submit_no = submit.submit_no
+                    code = submit.program
+                                
+            grade = Grade.objects.get(submit_no=submit_no) 
+            feedback = eval(grade.feedback)
             
             feed_length = 0
             for feed in feedback.values():
                 feed_length += len(feed)
 
-            if "grading" in request.POST:
-                btn = "grading"
-            elif "submit" in request.POST:
-                btn = "submit"
-
-                submission = Submission()
-                submission.assignment_no = assignment
-                submission.email = Account.objects.get(email=email)
-                submission.program = submission_path
-                submission.created_at = datetime.now()
-                submission.save()
-
-                grade = Grade()
-                grade.submit_no = submission
-                grade.state = state
-                grade.score = d_score
-                grade.passfail = passfail
-                grade.hints = hints
-                grade.feedback = feedback
-                grade.patch = patch
-                grade.result = result
-                grade.save()
-                
-            return render(request, 'cheppy/coding.html', {
+            return render(request, 'cheppy/solution.html', {
                 "email":email,
+                'name':name,
                 "assignment":assignment,
-                'testcases':testcases,
+                'testsuite':testsuite_map,
                 "code":code,
-                "state":state,
-                "score":d_score,
-                "passfail":passfail,
-                "hints":hints,
-                "hint_length":hint_length,
+                "state":grade.state,
+                "score":grade.score,
+                "passfail":eval(grade.passfail),
                 "feedback":feedback,
                 "feed_length":feed_length,
-                "patch":patch,
-                "result":result,
-                "diff":diff,
+                "patch":grade.patch,
+                "result":grade.result,
+                "diff":diff_2_str(code, grade.patch),
                 "btn":btn,
             })
 
-    return render(request, 'cheppy/coding.html')
+    return render(request, 'cheppy/solution.html')
 
 
 def survey(request):
@@ -385,3 +411,4 @@ def diff_2_str(submission, solution):
 
 def test_page(request):
     return render(request, 'cheppy/test_page.html')
+

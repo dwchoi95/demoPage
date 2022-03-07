@@ -4,6 +4,7 @@
   <head>
     {% load static %}
     {% load custom_tags %}
+    <link rel="stylesheet" href="{% static 'admin/css/footer.css' %}">
     <script src="{% static 'admin/js/loading.js' %}" type="text/javascript"></script>
     <script src="{% static 'admin/js/clipboard.js' %}" type="text/javascript"></script>
     {% comment %} <script src="{% static 'admin/js/noback.js' %}" type="text/javascript"></script> {% endcomment %}
@@ -14,18 +15,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.1/styles/github.min.css"/>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/diff2html/bundles/css/diff2html.min.css"/>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/diff2html/bundles/js/diff2html-ui.min.js"></script>
-    <style>
-      .CodeMirror {
-        border: 3px solid #eee;
-        font-family: monospace;
-        height: 3000px;
-        color: black;
-        direction: ltr;
-      }
-    </style>
+    
   </head>
-  <body onload="noBack();" onpageshow="if(event.persisted) noBack();" onunload="">
-    <div style="height: 100%;">
+  <body onload="noBack();" onpageshow="if(event.persisted) noBack();" onunload="" style="overflow: scroll;">
       <div id="top" class="shadow pt-4 pb-4 h-10" style="background-color: #414e5ae5;">
         <div class="row">
           <div class="col-3 ms-4">
@@ -45,14 +37,12 @@
           <div class="col-3"></div>
         </div>
       </div>
-      <div style="height: 90%;">
-        <div class="row vh-100">
+      <div class="row">
           <div class="col-3 shadow p-0" style="background-color: #fcfcfc;">
-            <div style="height: 50%;">
               <div class="text-white pt-3 pb-3 ps-3 w-100" style="background-color: #414e5a;">
                 <h5>문제와 제한사항</h5>
               </div>
-              <div class="overflow-auto">
+              <div class="overflow-auto" style="height: 35vh;">
                 <div class="ps-4 pt-2 pb-2" style="background-color: #414E5A4D;">
                   <h6>문제</h6>
                 </div>
@@ -66,46 +56,38 @@
                   <h7>{{ assignment.constraint }}</h7>
                 </div>
               </div>
-            </div>
-
-            <div style="height: 50%;">
-              <div class="text-white pt-4 pb-4 ps-4" style="background-color: #414e5a;">
-                <h5>테스트케이스</h5>
+              <div class="text-white pt-3 pb-3 ps-3 w-100" style="background-color: #414e5a;">
+                <h5>채점요소</h5>
               </div>
-              <div class="overflow-auto container pt-3 pb-3" style="height: 85%;">
-                {% for testcase in testcases %}
-                  {% if testcase.open_tc %}
-                    <button class="btn btn-outline-primary copy-btn" id="tc_no" onclick="copyClipboard('{{ testcase.in_tc }}')">테스트케이스 {{ testcase.tc_no }}번</button><br>
-                    <h7>입력값: {{ testcase.in_tc }}</h7><br>
-                    <h7>출력값: {{ testcase.out_tc }}</h7><br><br><br>
-                  {% endif %}
-                {% endfor %}
+              <div class="overflow-auto" style="height: 35vh;">
+                <div class="container pt-3 pb-3">
+                  {% for tc_no, testcase in testsuite.items %}
+                    <button class="btn btn-outline-primary copy-btn" id="tc_no" onclick="copyClipboard('{{ testcase.0 }}')">테스트케이스 {{ tc_no }}번</button><br>
+                    <h7>입력값: {{ testcase.0 }}</h7><br>
+                    <h7>출력값: {{ testcase.1 }}</h7><br><br><br>
+                  {% endfor %}
+                </div>
               </div>
-            </div>
           </div>
 
           <div class="col-6 p-4">
             <form method="post" action="{% url 'coding' %}">
               {% csrf_token %}
               <div class="spinner-border" role="status" id="loadingStatus" style="position:absolute; z-index:1000; display:none; left:49%; top:49%;"></div>
-              <div class="pt-3 pb-3 ps-3">
-                <h5>코드작성</h5>
-              </div>
+              <div class="pt-3 pb-3 ps-3"><h5>코드작성</h5></div>
               <div class="">
                 {% load djangocodemirror_tags %}
-                <textarea style="tab-size: 4; width:100% height: 500px;" id="code" name="code" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t\b\b\b\b'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}">{% if code %}{{ code }}{% else %}{{ assignment.format }}{% endif %}</textarea>
+                <textarea style="tab-size: 4;" id="code" name="code" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t\b\b\b\b'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}">{% if code %}{{ code }}{% else %}{{ assignment.format }}{% endif %}</textarea>
                 {% codemirror_instance 'python' 'code_codemirror' 'code' %}
-                {% if btn == "execute" or btn == "grading" or btn == "solve" or btn == "copy_tc" or btn == "error" %}
-                  <div class="row ps-2 pe-2 mt-5">
-                    <div class="col-9">
-                      <input class="btn btn-lg btn-primary btn-block" type="submit" name="execute" value="실행" onclick="showLoading()">
-                      <input class="btn btn-lg btn-primary btn-block" type="submit" name="grading" value="채점" onclick="showLoading()">
-                    </div>
-                    <div class="col-3 text-end">
-                      <input class="btn btn-lg btn-danger btn-block" type="submit" name="submit" onclick="submit()" value="제출" onclick="showLoading()">
-                    </div>
+                <div class="row ps-2 pe-2 mt-5">
+                  <div class="col-9">
+                    <input class="btn btn-lg btn-primary btn-block" type="submit" name="execute" value="실행" onclick="showLoading()">
+                    <input class="btn btn-lg btn-primary btn-block" type="submit" name="grading" value="채점" onclick="showLoading()">
                   </div>
-                {% endif %}
+                  <div class="col-3 text-end">
+                    <input class="btn btn-lg btn-danger btn-block" type="submit" name="submit" onclick="submit()" value="제출" onclick="showLoading()">
+                  </div>
+                </div>
               </div>
             </form>
           </div>
@@ -114,140 +96,60 @@
             <div class="accordion accordion-flush">
               <div class="accordion-item">
                 <h2 class="accordion-header" id="headingOne">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree" style="background-color: #414e5a;">
+                  <button class="accordion-button collapsed text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree" style="background-color: #414e5a;">
                     {% if btn == "grading" %}
                       <h5>채점결과</h5>
-                    {% elif btn == "copy_tc" %}
-                      <h5>{{ tc_no }}결과</h5>
                     {% elif state %}
                       <h5>성적</h5>
-                    {% else %}
+                    {% elif btn == "execute" %}
                       <h5>실행결과</h5>
                     {% endif %}
                   </button>
                 </h2>
-                {% if btn == "execute" or btn == "grading" or btn == "error" %}
                 <div id="collapseThree" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                {% else %}
-                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">  
-                {% endif %}
-                    <div class="accordion-body in">
-                    {% if btn == "execute" or btn == "copy_tc" or btn == "error" %}
-                      <h7>출력값: {{ result|linebreaks }}</h7><br>
-                    {% elif state %}
-                      <h7>{{ email }}님의 채점 결과는 {{ state }} 입니다.</h7><br><br>
-                      <h7>총점:{{ score }}</h7><br><br><br>
+                  <div class="accordion-body in overflow-auto" style="height: 35vh;">
+                    {% if state %}
+                      <h7>{{ name }}님의 채점 결과는 <mark>{{ state }}</mark> 입니다.</h7><br><br>
+                      <h7>총점: {{ score }}</h7><br><br><br>
                       {% for num, res in passfail.items %}
-                        <h7>테스트케이스 {{ num }}번: {{ res }}</h7><br><br>
-                        {% if btn == "submit" or btn == "solution" or btn == "feed" %}
-                          {% for testcase in testcases %}
-                            {% if num == testcase.tc_no and res == "Fail" %}
-                              <h7>입력값: {{ testcase.in_tc }}</h7><br>
-                              <h7>출력값: {{ testcase.out_tc }}</h7><br><br><br>
-                            {% endif %}
+                          <mark><h7>테스트케이스 {{ num }}번: {{ res }}</h7></mark><br><br>
+                          {% for tc_no, testcase in testsuite.items %}
+                              {% if num == tc_no and res == "Fail" %}
+                                  <h7>입력값: {{ testcase.0 }}</h7><br>
+                                  <h7>출력값: {{ testcase.1 }}</h7><br><br><br>
+                              {% endif %}
                           {% endfor %}
-                        {% endif %}
                       {% endfor %}
-                      
+                    {% else %}
+                      <h7>{{ result|linebreaks }}</h7><br>
                     {% endif %}
                   </div>
                 </div>
               </div>
             </div>
-            {% if btn == "grading" %}
-              {% if state == "wrong" %}
-                <div class="accordion accordion-flush">
-                  <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingOne">
-                      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="background-color: #414e5a;">
-                        <h5 class="text-white me-3">힌트</h5>
-                          <h5><span class="badge rounded-pill bg-warning text-dark">{{ hint_length }}+</span></h5>
-                      </button>
-                    </h2>
-                    <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                      <div class="accordion-body">
-                        <div class="overflow-auto container pt-3 pb-3" style="height: 50%;">
-                          {% for line, hint_list in hints.items %}
+            {% if btn == "grading" and state == "wrong" %}
+              <div class="accordion accordion-flush">
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="background-color: #414e5a;">
+                      <h5 class="text-white me-3">힌트</h5>
+                        <h5><span class="badge rounded-pill bg-warning text-dark">{{ hint_length }}+</span></h5>
+                    </button>
+                  </h2>
+                  <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                    <div class="accordion-body in overflow-auto" style="height: 35vh;">
+                        {% for line, hint_list in hints.items %}
+                          {% if forloop.first %}
                             {% for hint_map in hint_list %}
                               {% for edit, hint in hint_map.items %}
                                 <div class="row container m-4">
-                                  <div class="col-2 me-2">
-                                    <h4><span class="badge bg-warning text-dark">line {{ line }}</span></h4>
-                                  </div>
-                                  <div class="col">
-                                    <p class="fs-5">{{ edit }} {{ hint }}</p>
-                                  </div>
+                                  <h4><span class="badge bg-warning text-dark">line {{ line }}</span></h4>
+                                  <p class="fs-5">{{ edit }} {{ hint }}</p>
                                 </div>
                               {% endfor %}
                             {% endfor %}
-                          {% endfor %}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              {% endif %}
-            {% elif btn == "solution" or btn == "feed" or btn == "submit" %}
-              <div class="accordion accordion-flush">
-                <div class="accordion-item">
-                  <h2 class="accordion-header" id="headingOne">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="background-color: #414e5a;">
-                      <h5 class="text-white me-3">해결방안</h5>
-                      <h5>
-                        <span class="badge rounded-pill bg-warning text-dark">{{feed_length}}+</span></h5>
-                    </button>
-                  </h2>
-                  <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                    <div class="accordion-body">
-                      {% for line, feed_list in feedback.items %}
-                        {% if forloop.first %}
-                          {% for feed_map in feed_list %}
-                            {% if forloop.first %}
-                              {% for edit, fix in feed_map.items %}
-                                <form class="container" method="post" action="{% url 'coding' %}">
-                                  {% csrf_token %}
-                                  <input type="hidden" name="code" value="{{ code }}">
-                                  <input type="hidden" name="state" value="{{ state }}">
-                                  <input type="hidden" name="score" value="{{ score }}">
-                                  <input type="hidden" name="passfail" value="{{ passfail }}">
-                                  <input type="hidden" name="feedback" value="{{ feedback }}">
-                                  <input type="hidden" name="patch" value="{{ patch }}">
-                                  <input type="hidden" name="result" value="{{ result }}">
-                                  <input type="hidden" name="lineno" value="{{ line }}">
-                                  <input type="hidden" name="edit" value="{{ edit }}">
-                                  <input type="hidden" name="fix" value="{{ fix }}">
-                                  <div>
-                                    <div class="container mb-4">
-                                      <p class="fs-4">{{ line }}번째 줄</p>
-                                    </div>
-                                    <div class="container text-center mb-3 d-grid gap-2 d-md-block">
-                                      <button class="btn btn-lg btn-outline-primary text-dark ps-5 pe-5 shadow" type="submit" name="feed">{{ edit }} '{{ fix }}'</button>
-                                    </div>
-                                    <div class="container text-center">
-                                        <p class="fs-6">버튼을 누르면 코드가 바뀝니다.</p>
-                                    </div>
-                                  </div>
-                                </form>
-                              {% endfor %}
-                            {% endif %}
-                          {% endfor %}
-                        {% endif %}
-                      {% endfor %}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="accordion accordion-flush">
-                <div class="accordion-item">
-                  <h2 class="accordion-header" id="headingOne">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo" style="background-color: #414e5a;">
-                      <h5 class="text-white me-3">답안비교</h5>
-                    </button>
-                  </h2>
-                  <div id="collapseTwo" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                    <div class="accordion-body">
-                      <input type="hidden" id="diff2str" value="{{ diff }}">
-                      <div id="myDiffElement"></div>
+                          {% endif %}
+                        {% endfor %}
                     </div>
                   </div>
                 </div>
@@ -256,7 +158,22 @@
           </div>
         </div>
       </div>
-    </div>
   </body>
-
+  <style>
+    .CodeMirror {
+      border: 3px solid #eee;
+      font-family: monospace;
+      height: 70vh;
+      color: black;
+    }
+    .CodeMirror-linenumbers {}
+    .CodeMirror-linenumber {
+      padding: 0 3px 0 5px;
+      min-width: 20px;
+      text-align: right;
+      color: #999;
+      white-space: nowrap;
+    }
+  </style>
+  
 </html>

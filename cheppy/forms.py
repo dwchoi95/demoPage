@@ -7,14 +7,18 @@ from .models import *
 class AccountForm(forms.ModelForm):
     class Meta:
         model = Account
-        fields = ('email', 'password', 'name', 'birth',)
+        fields = ('email', 'name',)
 
 
 class AssignmentForm(forms.ModelForm):
     class Meta:
         model = Assignment
-        fields = ('assignment_no', 'title', 'problem', 'constraint', 'format',)
+        fields = ('assignment_no', 'title', 'problem', 'constraint', 'format', 'answer', 'level', 'timeout', )
 
+class SolutionForm(forms.ModelForm):
+    class Meta:
+        model = Solution
+        fields = ('solution_no', 'assignment_no', 'program', 'specification', 'standardization')
 
 class TestsuiteForm(forms.ModelForm):
     class Meta:
@@ -25,7 +29,7 @@ class TestsuiteForm(forms.ModelForm):
 class SubmissionForm(forms.ModelForm):
     class Meta:
         model = Submission
-        fields = ('submit_no', 'assignment_no', 'email', 'program',)
+        fields = ('submit_no', 'assignment_no', 'email', 'program', 'attempt',)
 
 
 class GradeForm(forms.ModelForm):

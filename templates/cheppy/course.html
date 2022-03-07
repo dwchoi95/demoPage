@@ -4,12 +4,12 @@
 <head>
     {% load static %}
     {% load custom_tags %}
-    <link rel="stylesheet" href="{% static 'admin/css/footer.css' %}">
+    {% comment %} <link rel="stylesheet" href="{% static 'admin/css/footer.css' %}"> {% endcomment %}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 </head>
 
-<body>
+<body style="overflow: visible;">
     <div class="container mb-3">
         <div class="row">
             <div class="col-sm-2">
@@ -23,19 +23,13 @@
             </div>
             <div class="col-sm-3 my-auto">
                 <ul class="nav justify-content-end align-middle">
-                    {% if email %}
+                    {% if name %}
                     <li class="nav-item pe-3">
                         <a class="btn btn-outline-secondary my-auto" href="/logout">로그아웃</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="btn btn-outline-primary my-auto" href="/course">마이페이지</a>
-                    </li>
                     {% else %}
                     <li class="nav-item pe-3">
-                        <a class="btn btn-outline-secondary my-auto" href="/login">로그인</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn btn-outline-primary my-auto" href="/sign">회원가입</a>
+                        <a class="btn btn-outline-secondary my-auto" href="/login">체험하기</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -44,10 +38,10 @@
     </div>
     <hr>
 
-    <div class="container">
+    <div class="container mb-5">
         <div class="container pt-5 pb-5 mb-3 " style="background-color:#F4F4F4">
             <div class="container ms-5 text-start">
-                <h6>{{email}} 님 환영합니다.</h6>
+                <h6>{{ name }} 님 환영합니다.</h6>
                 <h3 class="my-auto">
                     <button class="btn btn-primary btn-sm">풀기</button> 버튼을 누르시면 문제 풀기를 시작할 수 있습니다!<br>
                     풀기를 완료하시면 <button class="btn btn-primary btn-sm">피드백</button> 버튼을 눌러 수정방안을 확인할 수 있습니다!
@@ -67,85 +61,72 @@
                 <h3 class="card-title mb-5">퀴즈</h3>
 
                 <div class="row mb-3">
-                    <div class="col-1">
-                        <h5>제출</h5>
+                    <div class="col-2">
+                        <h5>제출여부</h5>
                     </div>
                     <div class="col-4">
                         <h5>문제</h5>
                     </div>
-                    <div class="col-3">
-                        <h5>마감일자</h5>
-                    </div>
                     <div class="col-2">
                         <h5>난이도</h5>
                     </div>
-                    <div class="col-1">
+                    <div class="col-2">
                         <h5>점수</h5>
                     </div>
-                    <div class="col-1">
+                    <div class="col-2">
                         <h5>버튼</h5>
                     </div>
                 </div>
 
                 {% for assignment, results in data.items %}
-                    <form action="{% url 'coding' %}" method="post">
+                    <form action="{% url 'course' %}" method="post">
                         {% csrf_token %}
                         <div class="row mb-3">
                             {% if results %}
                                 {% for submission, grade in results.items %}
-                                    <div class="col-1">
+                                    <div class="col-2">
                                         <img src="/static/admin/img/course_done.png" class="img-fluid" alt="...">
                                     </div>
                                     <div class="col-4">
                                         <h5>{{ assignment.title }}</h5>
                                     </div>
-                                    <div class="col-3">
-                                        {% comment %} <h5>{{ assignment.deadline }}</h5> {% endcomment %}
-                                        <h5>-</h5>
-                                    </div>
                                     <div class="col-2">
-                                        {% if assignment.title in 'Sequential Search,Duplicate Elimination' %}
+                                        {% if assignment.level == '1' %}
                                             <h5>초급</h5>
-                                        {% elif assignment.title in 'Top-K' %}
+                                        {% elif assignment.level == '2' %}
                                             <h5>중급</h5>
                                         {% else %}
                                             <h5>상급</h5>
                                         {% endif %}
                                     </div>
-                                    <div class="col-1">
+                                    <div class="col-2">
                                         <h5>{{ grade.score }}점</h5>
                                     </div>
-                                    <div class="col-1">
-                                        <input type="hidden" name="submit_no" value="{{ submission.submit_no }}" />
-                                        <input type="hidden" name="grade_no" value="{{ grade.grade_no }}" />
+                                    <div class="col-2">
                                         <input type="hidden" name="assignment_no" value="{{ assignment.assignment_no }}">
                                         <button type="submit" name="solution" class="btn btn-primary btn-sm">답안확인</button>
                                     </div>
                                 {% endfor %}
                             {% else %}
-                                <div class="col-1">
+                                <div class="col-2">
                                     <img src="/static/admin/img/course_notyet.png" class="img-fluid" alt="...">
                                 </div>
                                 <div class="col-4">
                                     <h5>{{ assignment.title }}</h5>
                                 </div>
-                                <div class="col-3">
-                                    {% comment %} <h5>{{ assignment.deadline }}</h5> {% endcomment %}
-                                    <h5>-</h5>
-                                </div>
                                 <div class="col-2">
-                                    {% if assignment.title in 'Sequential Search,Duplicate Elimination' %}
+                                    {% if assignment.level == '1' %}
                                         <h5>초급</h5>
-                                    {% elif assignment.title in 'Top-K' %}
+                                    {% elif assignment.level == '2' %}
                                         <h5>중급</h5>
                                     {% else %}
                                         <h5>상급</h5>
                                     {% endif %}
                                 </div>
-                                <div class="col-1">
+                                <div class="col-2">
                                     <h5>-</h5>
                                 </div>
-                                <div class="col-1">
+                                <div class="col-2">
                                     <input type="hidden" name="assignment_no" value="{{ assignment.assignment_no }}">
                                     <button type="submit" name="solve" class="btn btn-primary btn-sm">문제풀기</button>
                                 </div>
@@ -157,7 +138,8 @@
             </div>
         </div>
     </div>
-    <div class="bg-light pt-4 pb-5">
+
+    <div class="bg-light pt-4 pb-5" id="footer">
         <div class="container">
             <div class="row mb-5">
                 <div class="col-2">
@@ -181,12 +163,10 @@
                     </a>
                 </div>
                 <div class="col-6 text-end">
-                    <a class="ms-2" href="#"><img src="/static/admin/img/footer_call.png" class="img-fluid"
-                            alt="..."></a>
-                    <a class="ms-2" href="#"><img src="/static/admin/img/footer_mail.png" class="img-fluid"
-                            alt="..."></a>
-                    <a class="ms-2" href="#"><img src="/static/admin/img/footer_insta.png" class="img-fluid"
-                            alt="..."></a>
+                    <a class="ms-2" href="#"><img src="/static/admin/img/footer_call.png" class="img-fluid" alt="..."></a>
+                    <a class="ms-2" href="#"><img src="/static/admin/img/footer_mail.png" class="img-fluid" alt="..."></a>
+                    <a class="ms-2" href="#"><img src="/static/admin/img/footer_insta.png" class="img-fluid" alt="..."></a>
+
                 </div>
             </div>
             <div class="container">
@@ -196,7 +176,7 @@
                 <div class="container">
                     <p class="text-secondary">
                         (주)SoTy | 대표 최동욱 | 경기도 수원시 장안구 서부로 2066<br>
-                        010-1234-5678 | contact@soty.com
+                        010-4440-6294 | autografee@gmail.com
                     </p>
                 </div>
             </div>
