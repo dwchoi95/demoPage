@@ -126,9 +126,9 @@ def coding(request):
         testsuite_map = OrderedDict(sorted(testsuite_map.items()))
 
         if request.method == "POST":
-            btn = "error"
+            btn = "execute"
             code = request.POST.get('code')
-
+            print(code)
             try: compile(code, "<string>", "exec")
             except:
                 return render(request, 'cheppy/coding.html', {
@@ -144,8 +144,6 @@ def coding(request):
             if "execute" in request.POST:
                 btn = "execute"
                 
-                result = "출력되는 값이 없습니다.\nReturn 되는 값이 있는지 함수를 제대로 실행시키고 있는지 확인해보세요."
-
                 backup_stdout = sys.stdout
                 sys.stdout = StringIO()
 
@@ -161,7 +159,7 @@ def coding(request):
                     sys.stdout = backup_stdout
 
                 if not result or result == "None":
-                    result = "아무런 출력값이 없습니다."
+                    result = "출력되는 값이 없습니다.\n함수를 호출하고 있는지, 반환(return) 되는 값이 있는지 확인해보세요."
                 
                 return render(request, 'cheppy/coding.html', {
                     "email":email,
@@ -225,31 +223,17 @@ def coding(request):
             if state == 'correct':
                 predata = predata_map[submission.submit_no]
                 for (p_code, p_st_code, p_spec) in predata.values():
-                    specification = p_spec
-                    standardization = p_st_code
                     solution = Solution()
                     solution.assignment_no = assignment
-                    solution.program = code
-                    solution.specification = specification
-                    solution.standardization = standardization
+                    solution.program = p_code
+                    solution.standardization = p_st_code
+                    solution.specification = p_spec
+                    
                     solution.save()
-
-            grade = Grade()
-            grade.submit_no = submission
-            grade.state = state
-            grade.score = d_score
-            grade.passfail = passfail
-            grade.hints = hints
-            grade.feedback = feedback
-            grade.patch = patch
-            grade.result = result
-            grade.save()
-
 
             if "grading" in request.POST:
                 btn = "grading"
-
-
+                
                 return render(request, 'cheppy/coding.html', {
                     "email":email,
                     'name':name,
@@ -267,6 +251,17 @@ def coding(request):
                     "btn":btn,
                 })
             elif "submit" in request.POST:
+                grade = Grade()
+                grade.submit_no = submission
+                grade.state = state
+                grade.score = d_score
+                grade.passfail = passfail
+                grade.hints = hints
+                grade.feedback = feedback
+                grade.patch = patch
+                grade.result = result
+                grade.save()
+
                 return redirect(solution)
 
         return render(request, 'cheppy/coding.html', {
@@ -411,4 +406,3 @@ def diff_2_str(submission, solution):
 
 def test_page(request):
     return render(request, 'cheppy/test_page.html')
-
