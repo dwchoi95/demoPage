@@ -128,7 +128,7 @@ def coding(request):
         if request.method == "POST":
             btn = "execute"
             code = request.POST.get('code')
-            print(code)
+            
             try: compile(code, "<string>", "exec")
             except:
                 return render(request, 'cheppy/coding.html', {
@@ -350,6 +350,10 @@ def solution(request):
         else:
             btn = "solution"
 
+            assignments = Assignment.objects.all()
+            submissions = Submission.objects.filter(email=email)
+            grades = Grade.objects.all()
+
             submissions = Submission.objects.filter(email=email, assignment_no=assignment_no)
 
             submit_no = 0
@@ -358,8 +362,8 @@ def solution(request):
                 if assignment.assignment_no == submit.assignment_no.assignment_no:
                     submit_no = submit.submit_no
                     code = submit.program
-                                
-            grade = Grade.objects.get(submit_no=submit_no) 
+
+            grade = Grade.objects.get(submit_no=submit_no)
             feedback = eval(grade.feedback)
             
             feed_length = 0
