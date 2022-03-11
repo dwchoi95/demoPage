@@ -128,7 +128,8 @@ def coding(request):
         if request.method == "POST":
             btn = "execute"
             code = request.POST.get('code')
-            
+            print(code)
+
             try: compile(code, "<string>", "exec")
             except:
                 return render(request, 'cheppy/coding.html', {
@@ -149,8 +150,8 @@ def coding(request):
 
                 try:
                     exec(code, globals())
-                except:
-                    pass
+                except Exception as e:
+                    print(e)
 
                 result = sys.stdout.getvalue().strip()
 
@@ -223,13 +224,13 @@ def coding(request):
             if state == 'correct':
                 predata = predata_map[submission.submit_no]
                 for (p_code, p_st_code, p_spec) in predata.values():
-                    solution = Solution()
-                    solution.assignment_no = assignment
-                    solution.program = p_code
-                    solution.standardization = p_st_code
-                    solution.specification = p_spec
+                    solution_db = Solution()
+                    solution_db.assignment_no = assignment
+                    solution_db.program = p_code
+                    solution_db.standardization = p_st_code
+                    solution_db.specification = p_spec
                     
-                    solution.save()
+                    solution_db.save()
 
             if "grading" in request.POST:
                 btn = "grading"
@@ -271,7 +272,6 @@ def coding(request):
             'testsuite':testsuite_map,
             "btn":"execute",
         })
-
 
     return render(request, 'cheppy/coding.html')
 

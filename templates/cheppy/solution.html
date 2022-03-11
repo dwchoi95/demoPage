@@ -22,21 +22,19 @@
     
   </head>
   <script type="text/javascript">
-      
     $(window).load(function(){
-        var minLines = 5;
         var startingValue = document.getElementById("code").value;
 
-        for (var i = 0; i < minLines; i++) {
-            startingValue += '\n';
-        }
         var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
           mode: "python",
           lineNumbers: true,
           gutter: true,
           lineWrapping: true,
           value: startingValue,
+          indentUnit: 4,
+          tabSize: 4
         });
+        
         editor.setValue(startingValue);
     });
   </script> 
@@ -62,7 +60,7 @@
         </div>
         
         <div class="row">
-            <div class="col-4 shadow p-0" style="background-color: #fcfcfc;">
+            <div class="col-3 shadow p-0" style="background-color: #fcfcfc;">
                 <div class="text-white pt-3 pb-3 ps-3 w-100" style="background-color: #414e5a;">
                 <h5>문제</h5>
                 </div>
@@ -73,7 +71,7 @@
                 </div>
             </div>
 
-            <div class="col-4 shadow p-0" style="background-color: #fcfcfc;">
+            <div class="col-3 shadow p-0" style="background-color: #fcfcfc;">
                 <div class="text-white pt-3 pb-3 ps-3 w-100" style="background-color: #414e5a;">
                     <h5>제한사항</h5>
                 </div>
@@ -84,7 +82,7 @@
                 </div>
             </div>
 
-            <div class="col-4 shadow p-0" style="background-color: #fcfcfc;">
+            <div class="col-3 shadow p-0" style="background-color: #fcfcfc;">
                 <div class="text-white pt-3 pb-3 ps-3 w-100" style="background-color: #414e5a;">
                     <h5>성적</h5>
                 </div>
@@ -104,27 +102,12 @@
                     </div>
                 </div>
             </div>
-        </div>
-      
-        <div class="row">
-            <div class="col-6 shadow p-0" style="background-color: #fcfcfc;">
-                <div class="text-white pt-3 pb-3 ps-3 w-100" style="background-color: #414e5a;">
-                    <h5>내 코드</h5>
-                </div>
-                <div class="overflow-auto" style="height: 40vh;">
-                    <div class="container pt-3 pb-3">
-                        {% comment %} {% load djangocodemirror_tags %} {% endcomment %}
-                        <textarea style="tab-size: 4;" id="code" name="code" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t\b\b\b\b'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}">{% if code %}{{ code }}{% else %}{{ assignment.format }}{% endif %}</textarea>
-                        {% comment %} {% codemirror_instance 'python' 'code_codemirror' 'code' %} {% endcomment %}
-                    </div>
-                </div>
-            </div>
 
-            <div class="col-6 shadow p-0" style="background-color: #fcfcfc;">
+            <div class="col-3 shadow p-0" style="background-color: #fcfcfc;">
                 <div class="text-white pt-3 pb-3 ps-3 w-100" style="background-color: #414e5a;">
                     <h5>해결방안   <span class="rounded-pill bg-warning text-dark">   {{feed_length}}+   </span></h5>
                 </div>
-                <div class="overflow-auto" style="height: 40vh;">
+                <div class="overflow-auto" style="height: 20vh;">
                     <div class="container pt-3 pb-3">
                         {% for line, feed_list in feedback.items %}
                             {% if forloop.first %}
@@ -163,24 +146,40 @@
                     </div>
                 </div>
             </div>
+            
         </div>
-
+      
         <div class="row">
-            <div class="accordion accordion-flush">
-                <div class="accordion-item">
-                  <h2 class="accordion-header" id="headingOne">
-                    <button class="accordion-button text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo" style="background-color: #414e5a;">
-                      <h5 class="text-white me-3">답안비교</h5>
-                    </button>
-                  </h2>
-                  <div id="collapseTwo" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                    <div class="accordion-body">
-                      <input type="hidden" id="diff2str" value="{{ diff }}">
-                      <div id="myDiffElement"></div>
+            <div class="col-6 shadow p-0" style="background-color: #fcfcfc;">
+                <div class="text-white pt-3 pb-3 ps-3 w-100" style="background-color: #414e5a;">
+                    <h5>내 코드</h5>
+                </div>
+                <div class="overflow-auto">
+                    <div class="container pt-3 pb-3">
+                        {% comment %} {% load djangocodemirror_tags %} {% endcomment %}
+                        <textarea style="tab-size: 4;" id="code" name="code" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t\b\b\b\b'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}">{% if code %}{{ code }}{% else %}{{ assignment.format }}{% endif %}</textarea>
+                        {% comment %} {% codemirror_instance 'python' 'code_codemirror' 'code' %} {% endcomment %}
                     </div>
-                  </div>
                 </div>
             </div>
+            <div class="col-6 shadow p-0" style="background-color: #fcfcfc;">
+                <div class="accordion accordion-flush">
+                    <div class="accordion-item">
+                      <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo" style="background-color: #414e5a;">
+                          <h5 class="text-white me-3">답안비교</h5>
+                        </button>
+                      </h2>
+                      <div id="collapseTwo" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                          <input type="hidden" id="diff2str" value="{{ diff }}">
+                          <div id="myDiffElement"></div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            
         </div>
   </body>
   <style>
